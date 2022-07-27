@@ -1,0 +1,227 @@
+swagger: '2.0'
+info:
+  title: crud apis for saraha-app
+  version: 1.0.0
+  description: crud apis for sarahah app made using node.js ,express and mongoDB 
+  contact:
+    email: 'm6abdelmonsef@gmail.com'
+    website: 'https://github.com/mohamed-abdelmonsef'
+  servers:
+    -url: 'http://localhost:3000/'
+    description: this is my local server
+    -url: 'https://api-for-note-app.herokuapp.com/'
+    description: this is my heroku server
+schemes: [https ,http]   
+produces:
+  - application/json
+consumes:
+  - application/json
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: x-access-token
+    in: header
+##############################################
+
+tags:
+  - name: Auth
+  - name: User 
+
+
+############################################################################################
+paths:
+
+### registeration endpoint
+  /register:
+    put:
+      summary: api for adding new user
+      tags:
+        - Auth
+      parameters:
+        - in: body
+          name: user
+          required: true
+          description: user inputs
+          schema:
+            $ref: '#/components/schemas/userRegister'
+      responses:
+        201:
+          description: the user registered successfully
+          content:
+            application/json:
+              $ref: '#/components/schemas/userRegister'
+        422:
+          description: invalid data  
+          content:
+            application/json:
+              $ref: '#/components/schemas/userRegister'
+        500:
+          description: db or server error (unexpected error)         
+
+######### login api
+  /login:
+    post:
+      summary: api for logging in
+      tags:
+        - Auth    
+      parameters:
+        - in: body
+          name: user
+          required: true
+          description: user inputs
+          schema:
+            $ref: '#/components/schemas/userLogin'
+      responses:
+        200:
+          description: the user logged in successfully
+          content:
+            application/json:
+              $ref: '#/components/schemas/userLogin'
+        401:
+          description: invalid password
+          content:      
+            application/json:
+              $ref: '#/components/schemas/userLogin'                
+        404:
+          description: user not found
+          content:      
+            application/json:
+              $ref: '#/components/schemas/userLogin'
+        422:
+          description: invalid data  
+          content:
+            application/json:
+              $ref: '#/components/schemas/userLogin'              
+        500:
+          description: db or server error (unexpected error)
+
+#### retrive all messages of logged in user
+  /messages:
+    get:
+      security:
+        - Bearer: []
+      summary: get all messages of logged in user
+      tags:
+        - User
+      responses:
+        200:
+          description: messages retrived successfully
+          content:
+            application/json:
+              $ref: '#/components/schemas/message'
+        500:
+          description: db or server error (unexpected error) 
+        401:
+          description: Unauthorized user    
+        403:
+          description: No token provided!
+
+
+#### share link to people to send you messages
+  /shareLink:
+    get:
+      security:
+        - Bearer: []
+      summary: share link to people to send you messages
+      tags:
+        - User
+      responses:
+        200:
+          description: get link to share
+      
+
+
+#### send message endpoint
+  /sendMessage/{id}:
+    post:
+      summary: api for add new message
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: id of user ,you want send message to
+          schema:
+            type: string
+        - in: body
+          name: message
+          description: message to user
+          schema:
+            $ref: '#/components/schemas/message'
+      responses:
+        200:
+          description: message sent successfully
+          content:
+            application/json:
+              $ref: '#/components/schemas/message'
+        404:
+          description: user not found or not exist anymore
+        500:
+          description: db or server error (unexpected error) 
+
+############################################################################################
+components:
+  schemas:
+### user registeration schema 
+    userRegister:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: user name
+        email:
+          type: string
+          description: user email
+        password:
+          type: string
+          description: password must contain numbers
+        confirmPass:
+          type: string
+          description: confirmation password
+      example:
+        name: zain
+        email: mo@gmail.com
+        password: aa1
+        confirmPass: aa1        
+
+#### user login schema
+    userLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties: 
+        email:
+          type: string
+          description: user email
+        password:
+          type: string
+          description: password must contain numbers
+      example:
+        email: mo@gmail.com
+        password: aa1
+
+## note schema
+    message:
+      type: object
+      required:
+        - message
+      properties: 
+        message:
+          type: string
+          description: content or message sending from anonymous 
+      example:
+        message: hello, you are great person
+
+
+
+
+
+
+
