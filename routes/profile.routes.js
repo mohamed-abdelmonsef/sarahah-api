@@ -15,8 +15,11 @@ module.exports = (app)=>{
 
     app.get('/profile/:userName',authJwt,controller.showProfile)
 
-    app.get('/replies/:id',authJwt,controller.showReplies)
+    app.get('/replies/:messageId',authJwt,controller.showReplies)
+
+    app.get('/shareLink/:userName',authJwt ,controller.shareLink)
 
     app.get('/follow/:userName',authJwt,controller.follow)
+    app.get('/unfollow/:userName',authJwt,controller.unfollow)
 
 }

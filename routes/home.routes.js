@@ -10,7 +10,5 @@ module.exports = (app)=>{
         next()
     })
 
-    app.get('/messages',authJwt,controller.displayMessages)
-
-    app.get('/shareLink',authJwt ,controller.shareLink)
+    app.get('/home',authJwt,controller.displayMessages)
 }

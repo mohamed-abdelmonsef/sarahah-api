@@ -4,14 +4,14 @@ const messageModel = require('../models/message.model')
 
 exports.sendMessage = async(req,res,next)=>{
     try {
-        let userId = req.params.id
-        let user = await userModel.findOne({_id : userId})  
+        let userName = req.params.userName
+        let user = await userModel.findOne({userName})  
         if (!user) {
-            return res.status(404).send({message:"user not found or wrong id"});
+            return res.status(404).send({message:"user not found or wrong userName"});
         }
         await messageModel.insertMany({
             message:req.body.message,
-            time:Date.now(),userId
+            time:Date.now(),userId:user._id
         }).then(()=>{
             res.status(200).send({message:"sent successfully"})
         })                     

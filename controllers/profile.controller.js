@@ -3,7 +3,6 @@ const Reply = require('../models/replies.model')
 const userModel = require('../models/user.model')
 let followed
 
-
 //START show messages that have no replies yet
 exports.privateQuestions = async(req,res,next)=>{
     try {
@@ -51,7 +50,7 @@ exports.showProfile = async(req,res,next)=>{
         if (!user) {
             return res.status(404).json({message:'this user not exist'})
         }
-        let messages = await messageModel.find({userId:req.userId,answered:true})
+        let messages = await messageModel.find({userId:user._id,answered:true})
         res.status(200).send({messages:messages,followed:followed})    
     } catch (error) {
         if(!error.statusCode){
@@ -65,7 +64,7 @@ exports.showProfile = async(req,res,next)=>{
 
 //START of show replies for one message
 exports.showReplies = async(req,res,next)=>{
-    let messageID = req.params.id
+    let messageID = req.params.messageId
     try {
         let message = await messageModel.findOne({_id:messageID})
         if(!message){
@@ -83,20 +82,46 @@ exports.showReplies = async(req,res,next)=>{
 }
 //END of show replies for one message
 
+exports.shareLink = async(req,res)=>{
+    let user = await userModel.findOne({_id:req.userId})
+    let fullLink = req.protocol +'://' +req.headers.host+'/sendMessage/' + user.userName
+    res.status(200).send(fullLink)
+} 
+
 ////////////////////////////////////follow - unfollow
 
 exports.follow = async(req,res,next)=>{
     try {
+        if(followed){
+            return res.status(200).json({message:'you followed him already'})  
+        }
         let userName = req.params.userName
         let user = await userModel.findOne({userName})
+        await userModel.updateOne({_id:user._id},{$push:{followers:req.userId}})
+        await userModel.updateOne({_id:req.userId},{$push:{following:user._id}})
+        followed = true
+        res.status(200).json({message:`you followed ${user.userName}`})
+    } catch (error) {
+        {
+            if(!error.statusCode){
+                error.statusCode = 500
+            }
+            next(error)            
+        } 
+    }
+}
+
+exports.unfollow = async(req,res,next)=>{
+    try {
         if(!followed){
-            await userModel.updateOne({_id:user._id},{$push:{followers:req.userId}})
-            await userModel.updateOne({_id:req.userId},{$push:{following:user._id}})
-            return res.status(200).json({message:`you folowed ${user.userName}`})
+            res.status(200).json({message:`you unfollowed him already`})
         }
+        let userName = req.params.userName
+        let user = await userModel.findOne({userName})
         await userModel.updateOne({_id:user._id},{$pull:{followers:req.userId}})
         await userModel.updateOne({_id:req.userId},{$pull:{following:user._id}})
-        res.status(200).json({message:`you unfolowed ${user.userName}`})   
+        followed = false
+        res.status(200).json({message:`you unfollowed ${user.userName}`}) 
     } catch (error) {
         {
             if(!error.statusCode){
