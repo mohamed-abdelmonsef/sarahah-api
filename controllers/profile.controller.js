@@ -1,7 +1,7 @@
 const messageModel = require('../models/message.model')
 const Reply = require('../models/replies.model')
 const userModel = require('../models/user.model')
-let followed
+let followed = false
 
 //START show messages that have no replies yet
 exports.privateQuestions = async(req,res,next)=>{
@@ -46,7 +46,9 @@ exports.showProfile = async(req,res,next)=>{
     let userName = req.params.userName
     try {
         let user = await userModel.findOne({userName})
-        followed = user.followers.includes(req.userId)
+        if (!user.followers) {
+            followed = user.followers.includes(req.userId)      
+        }
         if (!user) {
             return res.status(404).json({message:'this user not exist'})
         }
