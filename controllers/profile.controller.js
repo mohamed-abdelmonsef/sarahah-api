@@ -20,7 +20,7 @@ exports.privateQuestions = async(req,res,next)=>{
 
 //START sending replies to message
 exports.replyMessage = async(req,res,next)=>{
-    let messageID = req.params.id
+    let messageID = req.params.messageId
     try {
         let message = await messageModel.findOne({_id:messageID,userId:req.userId})
         if (!message) {

@@ -11,7 +11,7 @@ module.exports = (app)=>{
 
     app.get('/profile/privateQuestions',authJwt,controller.privateQuestions)
 
-    app.post('/profile/privateQuestions/:id',authJwt,controller.replyMessage)
+    app.post('/profile/privateQuestions/:messageId',authJwt,controller.replyMessage)
 
     app.get('/profile/:userName',authJwt,controller.showProfile)
 

@@ -26,7 +26,9 @@ securityDefinitions:
 
 tags:
   - name: Auth
-  - name: User 
+  - name: Profile 
+  - name: Home 
+  - name: Send Message 
 
 
 ############################################################################################
@@ -97,13 +99,13 @@ paths:
           description: db or server error (unexpected error)
 
 #### retrive all messages of logged in user
-  /messages:
+  /home:
     get:
       security:
         - Bearer: []
-      summary: get all messages of logged in user
+      summary: get all messages of my following list
       tags:
-        - User
+        - Home
       responses:
         200:
           description: messages retrived successfully
@@ -117,32 +119,204 @@ paths:
         403:
           description: No token provided!
 
+##############################  profile endpoints ################################# 
+
+
+########## endpoint that retrieve the messages sent to user .
+  /profile/privateQuestions:
+    get:
+      security:
+        - Bearer: []
+      summary: get all messages of logged in user that have no answers
+      tags:
+        - Profile
+      responses:
+        200:
+          description: messages that have no answers yet, retrived successfully
+          content:
+            application/json:
+              $ref: '#/components/schemas/message'
+        500:
+          description: db or server error (unexpected error) 
+        401:
+          description: Unauthorized user    
+        403:
+          description: No token provided!
+
+
+############ endpoint for replying ##############
+  /profile/privateQuestions/{messageId}:
+    post:
+      security:
+        - Bearer: []
+      summary: api for reply to message
+      tags:
+        - Profile
+      parameters:
+        - in: path
+          name: messageId
+          required: true
+          description: id of message ,you want reply to it
+          schema:
+            type: string
+        - in: body
+          name: reply
+          description: reply to message
+          schema:
+            $ref: '#/components/schemas/reply'
+      responses:
+        200:
+          description: reply sent successfully
+          content:
+            application/json:
+              $ref: '#/components/schemas/reply'
+        404:
+          description: message not found or not exist anymore
+        500:
+          description: db or server error (unexpected error) 
+
+
+########## endpoint that get profile of user
+  /profile/{userName}:
+    get:
+      security:
+        - Bearer: []
+      summary: get all messages of this profile
+      tags:
+        - Profile
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          description: userName of profile ,you want show it
+          schema:
+            type: string  
+      responses:
+        200:
+          description: messages that have answers of this user, retrived successfully
+          content:
+            application/json:
+              $ref: '#/components/schemas/message'
+        500:
+          description: db or server error (unexpected error) 
+        401:
+          description: Unauthorized user    
+        403:
+          description: No token provided!
+
+########## endpoint that retrived message with its replies
+  /replies/{messageId}:
+    get:
+      security:
+        - Bearer: []
+      summary: get message and its replies
+      tags:
+        - Profile
+      parameters:
+        - in: path
+          name: messageId
+          required: true
+          description: messageId of message ,that i want see its replies
+          schema:
+            type: string  
+      responses:
+        200:
+          description: the message and its replies
+          content:
+            application/json:
+              $ref: '#/components/schemas/message'
+              $ref: '#/components/schemas/reply'
+        500:
+          description: db or server error (unexpected error) 
+        401:
+          description: Unauthorized user    
+        403:
+          description: No token provided!
+
+########## endpoint to follow user
+  /follow/{userName}:
+    get:
+      security:
+        - Bearer: []
+      summary: follow user
+      tags:
+        - Profile
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          description: userName of profile ,you want to follow
+          schema:
+            type: string  
+      responses:
+        200:
+          description: you followed this user successfully
+        500:
+          description: db or server error (unexpected error) 
+        401:
+          description: Unauthorized user    
+        403:
+          description: No token provided!
+
+
+########## endpoint to unfollow user
+  /unfollow/{userName}:
+    get:
+      security:
+        - Bearer: []
+      summary: unfollow user
+      tags:
+        - Profile
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          description: userName of profile ,you want to unfollow
+          schema:
+            type: string  
+      responses:
+        200:
+          description: you unfollowed this user successfully
+        500:
+          description: db or server error (unexpected error) 
+        401:
+          description: Unauthorized user    
+        403:
+          description: No token provided!
+
 
 #### share link to people to send you messages
-  /shareLink:
+  /shareLink/{userName}:
     get:
       security:
         - Bearer: []
       summary: share link to people to send you messages
       tags:
-        - User
+        - Profile
+      parameters:
+        - in: path
+          name: userName
+          required: true
+          description: userName of user ,to share link with people to send messages
+          schema:
+            type: string  
       responses:
         200:
           description: get link to share
       
-
+###############################################################################################
 
 #### send message endpoint
-  /sendMessage/{id}:
+  /sendMessage/{userName}:
     post:
       summary: api for add new message
       tags:
-        - User
+        - Send Message
       parameters:
         - in: path
-          name: id
+          name: userName
           required: true
-          description: id of user ,you want send message to
+          description: userName of user ,you want send message to
           schema:
             type: string
         - in: body
@@ -169,12 +343,17 @@ components:
       type: object
       required:
         - name
+        - userName
         - email
         - password
+        - confirmPass
       properties:
         name:
           type: string
-          description: user name
+          description: name
+        userName:
+          type: string
+          description: user name  
         email:
           type: string
           description: user email
@@ -186,6 +365,7 @@ components:
           description: confirmation password
       example:
         name: zain
+        userName: momo
         email: mo@gmail.com
         password: aa1
         confirmPass: aa1        
@@ -207,7 +387,7 @@ components:
         email: mo@gmail.com
         password: aa1
 
-## note schema
+## message schema
     message:
       type: object
       required:
@@ -219,6 +399,18 @@ components:
       example:
         message: hello, you are great person
 
+
+## reply schema
+    reply:
+      type: object
+      required:
+        - reply
+      properties: 
+        reply:
+          type: string
+          description: content or message sending from anonymous 
+      example:
+        reply: hello, you are great person
 
 
 
