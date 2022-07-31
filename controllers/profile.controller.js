@@ -46,12 +46,10 @@ exports.showProfile = async(req,res,next)=>{
     let userName = req.params.userName
     try {
         let user = await userModel.findOne({userName})
-        if (!user.followers) {
-            followed = user.followers.includes(req.userId)      
-        }
         if (!user) {
             return res.status(404).json({message:'this user not exist'})
         }
+        followed = user.followers.includes(req.userId)      
         let messages = await messageModel.find({userId:user._id,answered:true})
         res.status(200).send({messages:messages,followed:followed})    
     } catch (error) {
