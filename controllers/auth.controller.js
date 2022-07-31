@@ -92,7 +92,7 @@ exports.login = (req,res,next)=>{
         res.status(200).send({
             message:"logged in successfully",
             email:user.email,
-            userName:user.name,
+            userName:user.userName,
             accessToken:token
         })
     })

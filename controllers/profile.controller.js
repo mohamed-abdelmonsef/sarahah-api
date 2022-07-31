@@ -22,9 +22,9 @@ exports.privateQuestions = async(req,res,next)=>{
 exports.replyMessage = async(req,res,next)=>{
     let messageID = req.params.id
     try {
-        let message = await messageModel.find({_id:messageID})
+        let message = await messageModel.findOne({_id:messageID,userId:req.userId})
         if (!message) {
-            return res.status(404).json({message:'this message not found'})
+            return res.status(404).json({message:'this message not found or not authorized to replay on this'})
         }
         const reply = new Reply({reply:req.body.reply,time:Date.now(),messageID})
         reply.save().then(async(result)=>{
@@ -114,7 +114,7 @@ exports.follow = async(req,res,next)=>{
 exports.unfollow = async(req,res,next)=>{
     try {
         if(!followed){
-            res.status(200).json({message:`you unfollowed him already`})
+            return res.status(200).json({message:`you unfollowed him already`})
         }
         let userName = req.params.userName
         let user = await userModel.findOne({userName})
