@@ -12,7 +12,6 @@ exports.privateQuestions = async(req,res,next)=>{
         }
         let skip = (PAGE_NUM-1)*5
         let totalMessages = await messageModel.find({userId:req.userId,answered:false}).countDocuments()
-        console.log(totalMessages);
         let messages = await messageModel.find({userId:req.userId,answered:false}).skip(skip).limit(5)
         res.status(200).send({messages:messages,totalMessages:totalMessages})     
     } catch (error) {

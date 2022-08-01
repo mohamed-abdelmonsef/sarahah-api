@@ -123,13 +123,20 @@ paths:
 
 
 ########## endpoint that retrieve the messages sent to user .
-  /profile/privateQuestions:
+  /profile/privateQuestions?page={page}:
     get:
       security:
         - Bearer: []
       summary: get all messages of logged in user that have no answers
       tags:
         - Profile
+      parameters:
+        - in: path
+          name: page
+          required: false
+          description: number of page
+          schema:
+            type: int  
       responses:
         200:
           description: messages that have no answers yet, retrived successfully
@@ -177,20 +184,26 @@ paths:
 
 
 ########## endpoint that get profile of user
-  /profile/{userName}:
+  /profile/{userName}?page={page}:
     get:
       security:
         - Bearer: []
       summary: get all messages of this profile
       tags:
         - Profile
-      parameters:
+      parameters: 
         - in: path
           name: userName
           required: true
           description: userName of profile ,you want show it
           schema:
-            type: string  
+            type: string
+        - in: path
+          name: page
+          required: false
+          description: number of page
+          schema:
+            type: int      
       responses:
         200:
           description: messages that have answers of this user, retrived successfully
@@ -205,7 +218,7 @@ paths:
           description: No token provided!
 
 ########## endpoint that retrived message with its replies
-  /replies/{messageId}:
+  /replies/{messageId}?page={page}:
     get:
       security:
         - Bearer: []
@@ -218,7 +231,13 @@ paths:
           required: true
           description: messageId of message ,that i want see its replies
           schema:
-            type: string  
+            type: string
+        - in: path
+          name: page
+          required: false
+          description: number of page
+          schema:
+            type: int       
       responses:
         200:
           description: the message and its replies
