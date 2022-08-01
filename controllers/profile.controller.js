@@ -6,8 +6,15 @@ let followed = false
 //START show messages that have no replies yet
 exports.privateQuestions = async(req,res,next)=>{
     try {
-        let messages = await messageModel.find({userId:req.userId,answered:false})
-        res.status(200).send(messages)     
+        let PAGE_NUM = req.query.page || 1;
+        if (PAGE_NUM <= 0) {
+            PAGE_NUM = 1
+        }
+        let skip = (PAGE_NUM-1)*5
+        let totalMessages = await messageModel.find({userId:req.userId,answered:false}).countDocuments()
+        console.log(totalMessages);
+        let messages = await messageModel.find({userId:req.userId,answered:false}).skip(skip).limit(5)
+        res.status(200).send({messages:messages,totalMessages:totalMessages})     
     } catch (error) {
         if(!error.statusCode){
             error.statusCode = 500
@@ -49,9 +56,15 @@ exports.showProfile = async(req,res,next)=>{
         if (!user) {
             return res.status(404).json({message:'this user not exist'})
         }
-        followed = user.followers.includes(req.userId)      
-        let messages = await messageModel.find({userId:user._id,answered:true})
-        res.status(200).send({messages:messages,followed:followed})    
+        followed = user.followers.includes(req.userId)
+        let PAGE_NUM = req.query.page || 1;
+        if (PAGE_NUM <= 0) {
+            PAGE_NUM = 1
+        }
+        let skip = (PAGE_NUM-1)*5
+        let totalMessages = await messageModel.find({userId:req.userId,answered:false}).countDocuments()
+        let messages = await messageModel.find({userId:user._id,answered:true}).skip(skip).limit(5)
+        res.status(200).send({messages:messages,followed:followed,totalMessages:totalMessages})    
     } catch (error) {
         if(!error.statusCode){
             error.statusCode = 500
@@ -70,8 +83,14 @@ exports.showReplies = async(req,res,next)=>{
         if(!message){
             return res.status(404).json({message:"this message not exist or wrong id"})
         }
-        let replies =await Reply.find({messageID})
-        res.status(200).json({mainMessage:message,replies:replies})
+        let PAGE_NUM = req.query.page || 1;
+        if (PAGE_NUM <= 0) {
+            PAGE_NUM = 1
+        }
+        let skip = (PAGE_NUM-1)*5
+        let totalReplies = await Reply.find({messageID}).countDocuments()
+        let replies =await Reply.find({messageID}).skip(skip).limit(5)
+        res.status(200).json({mainMessage:message,replies:replies,totalReplies:totalReplies})
 
     } catch (error) {
         if(!error.statusCode){
