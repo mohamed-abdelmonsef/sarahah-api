@@ -20,7 +20,7 @@ exports.register= (req,res,next)=>{
                 to: email, 
                 subject: "Hello ✔",
                 text: "Hello world?", 
-                html: `<h1><a href='http://localhost:3000/verifyEmail/${token}'> please click here to confirm your email.. </a></h1>`
+                html: `<h1><a href='https://sarahah-api.herokuapp.com/verifyEmail/${token}'> please click here to confirm your email.. </a></h1>`
             }
             mailer.sendMail(emailContent,err=>{
                 if (err) {
