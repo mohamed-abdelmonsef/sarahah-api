@@ -11,7 +11,7 @@ exports.sendMessage = async(req,res,next)=>{
         }
         await messageModel.insertMany({
             message:req.body.message,
-            time:Date.now(),userId:user._id
+            userId:user._id
         }).then(()=>{
             res.status(200).send({message:"sent successfully"})
         })                     

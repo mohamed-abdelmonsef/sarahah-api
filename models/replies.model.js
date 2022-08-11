@@ -3,8 +3,7 @@ const Schema = mongoose.Schema
 
 const replySchema = new Schema({
     reply:String,
-    time:String,
     messageID:{type:mongoose.Schema.Types.ObjectId,ref:'message'},
-})
+},{timestamps : true})
 
 module.exports = mongoose.model('reply' ,replySchema)

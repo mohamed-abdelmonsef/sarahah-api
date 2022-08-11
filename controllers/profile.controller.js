@@ -32,7 +32,7 @@ exports.replyMessage = async(req,res,next)=>{
         if (!message) {
             return res.status(404).json({message:'this message not found or not authorized to replay on this'})
         }
-        const reply = new Reply({reply:req.body.reply,time:Date.now(),messageID})
+        const reply = new Reply({reply:req.body.reply,messageID})
         reply.save().then(async(result)=>{
             await messageModel.updateMany({_id:messageID},{$push:{replies:reply},answered:true})
             res.status(201).json({message:"replied successfully"})

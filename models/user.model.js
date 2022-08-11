@@ -9,6 +9,6 @@ const userSchema = mongoose.Schema({
     following:Array,
     emailConfirm:{type:Boolean ,default:false},
     messages:[{type:mongoose.Schema.Types.ObjectId,ref:'message'}]
-})
+},{timestamps : true})
 
 module.exports = mongoose.model('user' ,userSchema)
